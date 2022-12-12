@@ -1,30 +1,31 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package Bean;
 
-
 import Interfaz_Cliente.ICliente;
-import java.util.ArrayList;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.LinkedList;
-import java.util.List;
-import java.util.logging.*;
-import javax.annotation.*;
-import javax.ejb.*;
-import javax.jms.*;
-import objeto.Producto;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+import javax.annotation.Resource;
+import javax.ejb.Stateless;
+import javax.jms.Connection;
+import javax.jms.JMSException;
+import javax.jms.MessageProducer;
+import javax.jms.Queue;
+import javax.jms.QueueConnectionFactory;
+import javax.jms.Session;
+import javax.jms.TextMessage;
 
-/**
- *
- * @author beatriz
- */
 @Stateless
 public class TiendaSessionBean implements ICliente {
     
-    ArrayList<Producto> catalogoDeProductos;
-    Producto unProducto;
+    
+    //Recursos en los cuales se acumularan los pedidos
     
     @Resource(lookup = "jms/Queue")
     private Queue queue;
@@ -33,18 +34,18 @@ public class TiendaSessionBean implements ICliente {
     
     Session session;
     Connection connection;
-
+    
     @PostConstruct
-    public void makeConnection() {
+    public void Hacer_la_conexion(){
         try {
             connection = connectionFactory.createConnection();
         } catch (JMSException ex) {
             Logger.getLogger(TiendaSessionBean.class.getName()).log(Level.SEVERE, null, ex);
         }
-    }
-
+    }   
+    
     @PreDestroy
-    public void endConnection() {
+    public void Temina_la_conexion() {
         if (connection != null) {
             try {
                 connection.close();
@@ -53,48 +54,67 @@ public class TiendaSessionBean implements ICliente {
             }
         }
     }
-
-    public TiendaSessionBean() {
-        catalogoDeProductos = new ArrayList();
-    }
-
-    @Override
-    public void Agregar_Carrito(String res) {
-
-        unProducto = new Producto();
-        unProducto.setNombre(res);
-        catalogoDeProductos.add(unProducto);
-        
-        enviarMensajeJMS(res);
-
-    }
+   
+    
+    
 
     @Override
-    public List<String> obtenerProdcutos() {
+    public LinkedList<String> Obtener_Produtos() {
+        LinkedList<String>Productos= new LinkedList();
         
-        List<String> listaProductos;
-        listaProductos = new ArrayList();
-        for (Producto unProducto : catalogoDeProductos) {
-            String nombreProducto = unProducto.getNombre();
-            listaProductos.add(nombreProducto);
+        File r= new File("Productos.txt");
+        
+        try {
+            FileReader k = new FileReader(r);
+            BufferedReader l = new BufferedReader(k);
+            
+            String linea=l.readLine();
+            
+            while(linea!=null){
+                Productos.add(linea);
+                linea=l.readLine();
+            }
+            
+            l.close();
+            
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(TiendaSessionBean.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(TiendaSessionBean.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return listaProductos;
+        
+       return Productos;
     }
 
-    private TextMessage crearMensajeJMS(Session session, String mensajeTexto) {
-        TextMessage message = null;
+   
+    
+    @Override
+    public void Enviar_Productos_Comprados(LinkedList<String>Productos) {
+           
+          String producto;
+          int i=0;
+          while(i<Productos.size()){
+              producto=Productos.get(i);
+              enviarMensajeJMS(producto);
+              i++;
+          }
+               
+    }
+
+    public TextMessage crear_mensaje(Session sesion,String mensaje){
+          TextMessage message = null;
         try {
 
             message = session.createTextMessage();
-            message.setText(mensajeTexto);
+            message.setText(mensaje);
 
         } catch (JMSException ex) {
             Logger.getLogger(TiendaSessionBean.class.getName()).log(Level.SEVERE, null, ex);
         }
         return message;
     }
-
-    public void enviarMensajeJMS(String mensajeTexto) {
+    
+     public void enviarMensajeJMS(String mensajeTexto) {
         try {
             MessageProducer messageProducer;
             TextMessage message;
@@ -102,8 +122,8 @@ public class TiendaSessionBean implements ICliente {
             session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
             messageProducer = session.createProducer(queue);
 
-            System.out.println("Sending message: " + mensajeTexto);
-            message = crearMensajeJMS(session, mensajeTexto);
+            System.out.println("Enviando producto: " + mensajeTexto);
+            message = crear_mensaje(session, mensajeTexto);
             messageProducer.send(message);
         } catch (JMSException ex) {
             Logger.getLogger(TiendaSessionBean.class.getName()).log(Level.SEVERE, null, ex);
@@ -118,10 +138,8 @@ public class TiendaSessionBean implements ICliente {
 
         }
     }
-
-    @Override
-    public List consultar() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
+    
+    
+    
+    
 }

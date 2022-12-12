@@ -14,7 +14,7 @@ public class Producto {
     private int id;
     private float precio;
     private String nombre;
-    private String tipo;
+   
 
     public int getId() {
         return id;
@@ -32,14 +32,6 @@ public class Producto {
         this.precio = precio;
     }
 
-    public String getTipo() {
-        return tipo;
-    }
-
-    public void setTipo(String tipo) {
-        this.tipo = tipo;
-    }
-
     public String getNombre() {
         return nombre;
     }
@@ -48,7 +40,6 @@ public class Producto {
         this.nombre = nombre;
     }
    
-    
-    
+   
     
 }

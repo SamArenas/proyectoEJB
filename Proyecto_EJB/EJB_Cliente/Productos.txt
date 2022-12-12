@@ -1,0 +1,2 @@
+1,HPLaptop,8,000
+2,HPDesktop,15,000

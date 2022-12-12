@@ -6,8 +6,9 @@
 package Formas;
 
 import Funciones.Consultar_a_Servidor;
+import java.util.LinkedList;
 import java.util.StringTokenizer;
-import objeto.Producto;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -19,10 +20,13 @@ public class Cliente extends javax.swing.JFrame {
      * Creates new form Cliente
      */
     
-    Consultar_a_Servidor CS= new Consultar_a_Servidor();
+    Consultar_a_Servidor Cliente_Servidor= new Consultar_a_Servidor();
+    LinkedList<String>Productos_Comprados= new LinkedList();
+    int total=0;
     
     public Cliente() {
         initComponents();
+        llenar_lista();
     }
 
     /**
@@ -46,8 +50,8 @@ public class Cliente extends javax.swing.JFrame {
         jLabel4 = new javax.swing.JLabel();
         TxtTotal = new javax.swing.JTextField();
         jLabel5 = new javax.swing.JLabel();
-        jLabel6 = new javax.swing.JLabel();
-        CmbTipo = new javax.swing.JComboBox<>();
+        jLabel7 = new javax.swing.JLabel();
+        TxtPrecio = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -56,8 +60,18 @@ public class Cliente extends javax.swing.JFrame {
 
         BtnComprar.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         BtnComprar.setText("Comprar");
+        BtnComprar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                BtnComprarActionPerformed(evt);
+            }
+        });
 
         CmbLista_Productos.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        CmbLista_Productos.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                CmbLista_ProductosActionPerformed(evt);
+            }
+        });
 
         BtnAgregar.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         BtnAgregar.setText("Agregar");
@@ -83,9 +97,8 @@ public class Cliente extends javax.swing.JFrame {
         jLabel5.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         jLabel5.setText("Selecion de un producto");
 
-        jLabel6.setText("Tipo:");
-
-        CmbTipo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        jLabel7.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        jLabel7.setText("Precio:");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -99,27 +112,27 @@ public class Cliente extends javax.swing.JFrame {
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
+                                .addGap(163, 163, 163)
+                                .addComponent(jLabel1))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(20, 20, 20)
+                                .addComponent(BtnAgregar))
+                            .addGroup(layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(CmbLista_Productos, javax.swing.GroupLayout.PREFERRED_SIZE, 240, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(jLabel5))
+                            .addGroup(layout.createSequentialGroup()
+                                .addContainerGap()
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addGap(163, 163, 163)
-                                        .addComponent(jLabel1))
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addGap(20, 20, 20)
-                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                            .addGroup(layout.createSequentialGroup()
-                                                .addComponent(jLabel3)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(TxtCantidad, javax.swing.GroupLayout.PREFERRED_SIZE, 53, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                            .addComponent(jLabel5)
-                                            .addComponent(BtnAgregar)
-                                            .addGroup(layout.createSequentialGroup()
-                                                .addComponent(jLabel6)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(CmbTipo, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))))
-                                .addGap(29, 29, 29))
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addComponent(CmbLista_Productos, javax.swing.GroupLayout.PREFERRED_SIZE, 240, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(18, 18, 18)))
+                                    .addComponent(jLabel3)
+                                    .addComponent(jLabel7))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(TxtCantidad, javax.swing.GroupLayout.DEFAULT_SIZE, 73, Short.MAX_VALUE)
+                                    .addComponent(TxtPrecio))))
+                        .addGap(28, 28, 28)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 187, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jLabel2)
@@ -137,15 +150,15 @@ public class Cliente extends javax.swing.JFrame {
                     .addGroup(layout.createSequentialGroup()
                         .addContainerGap()
                         .addComponent(jLabel1)
-                        .addGap(29, 29, 29)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel6)
-                            .addComponent(CmbTipo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGap(35, 35, 35)
                         .addComponent(jLabel5)
                         .addGap(18, 18, 18)
                         .addComponent(CmbLista_Productos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel7)
+                            .addComponent(TxtPrecio, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(23, 23, 23)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel3)
                             .addComponent(TxtCantidad, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
@@ -170,28 +183,57 @@ public class Cliente extends javax.swing.JFrame {
 
     private void BtnAgregarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BtnAgregarActionPerformed
         // TODO add your handling code here:
-        Producto nuevo=new Producto();
-        String linea= (String)CmbLista_Productos.getSelectedItem();
-        StringTokenizer tokens=new StringTokenizer(linea,",");
-        int id=Integer.parseInt(tokens.nextToken());
-        String nombre=tokens.nextToken();
-        String tipo=(String)CmbTipo.getSelectedItem();
-        float price=Integer.parseInt(TxtCantidad.getText());
-        
-        nuevo.setId(id);
-        nuevo.setNombre(nombre);
-        nuevo.setPrecio(price);
-        nuevo.setTipo(tipo);
-        
-        CS.testStatelessEjb(nuevo);
-       
-        
-        
+        String producto = (String)CmbLista_Productos.getSelectedItem();
+        StringTokenizer p=new StringTokenizer(producto);
+        p.nextToken();
+        String nombre=p.nextToken();
+        int precio=Integer.parseInt(p.nextToken());   
+        agregar_a_carrito("Producto:"+nombre+"   Precio:"+Integer.toString(precio));
+        String cantidad_productos=TxtCantidad.getText();
+        producto = producto + "," + cantidad_productos;        
+        Productos_Comprados.add(producto);
+        total= total + precio;
+        String Total=Integer.toString(total);
+        TxtTotal.setText(Total);
+  
     }//GEN-LAST:event_BtnAgregarActionPerformed
+
+    private void CmbLista_ProductosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CmbLista_ProductosActionPerformed
+        // TODO add your handling code here:
+        String Select = (String)CmbLista_Productos.getSelectedItem();
+        StringTokenizer p=new StringTokenizer(Select,",");
+        TxtPrecio.setText(p.nextToken());
+        
+    }//GEN-LAST:event_CmbLista_ProductosActionPerformed
+
+    private void BtnComprarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BtnComprarActionPerformed
+        // TODO add your handling code here:
+        Cliente_Servidor.Comprar(Productos_Comprados);
+        JOptionPane.showMessageDialog(null, "Su compra ha sido realizada");
+    }//GEN-LAST:event_BtnComprarActionPerformed
+                                           
 
     /**
      * @param args the command line arguments
      */
+    
+    public void llenar_lista(){
+        LinkedList<String>Productos=Cliente_Servidor.Obtner_productos();
+        String prod;
+        int i=0;
+        while(i<Productos.size()){
+            prod=Productos.get(i);
+             StringTokenizer w=new StringTokenizer(prod,",");
+            CmbLista_Productos.addItem(w.nextToken(","));
+        }
+                
+    }
+    
+    public void agregar_a_carrito(String producto_con_precio){
+        TxtA_Mis_productos.append(producto_con_precio);
+        TxtA_Mis_productos.append(System.getProperty("line.separator"));
+    }
+    
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
@@ -228,16 +270,16 @@ public class Cliente extends javax.swing.JFrame {
     private javax.swing.JButton BtnAgregar;
     private javax.swing.JButton BtnComprar;
     private javax.swing.JComboBox<String> CmbLista_Productos;
-    private javax.swing.JComboBox<String> CmbTipo;
     private javax.swing.JTextArea TxtA_Mis_productos;
     private javax.swing.JTextField TxtCantidad;
+    private javax.swing.JTextField TxtPrecio;
     private javax.swing.JTextField TxtTotal;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
     private javax.swing.JScrollPane jScrollPane1;
     // End of variables declaration//GEN-END:variables
 }
